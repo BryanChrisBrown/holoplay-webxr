@@ -94,6 +94,7 @@ export default class HoloPlayXRDevice extends XRDevice {
       // Distance from frustum's vertex to target.
       const focalDistance = 0.5 * cfg.targetDiam / tanHalfFovy;
       const clipPlaneBias = focalDistance - cfg.targetDiam;
+      console.log(clipPlaneBias, 'HoloPlay WebXR - Clip Plane Bias')
 
       const mPose = this.basePoseMatrix;
       mat4.fromTranslation(mPose, [cfg.targetX, cfg.targetY, cfg.targetZ]);
@@ -116,7 +117,8 @@ export default class HoloPlayXRDevice extends XRDevice {
         const f = clipPlaneBias + renderState.depthFar;
         const halfYRange = n * tanHalfFovy;
         const t = halfYRange, b = -halfYRange;
-        const midpointX = n * -tanAngleToThisCamera;
+        // const midpointX = n * -tanAngleToThisCamera;
+        const midpointX = 0;
         const halfXRange = cfg.aspect * halfYRange;
         const r = midpointX + halfXRange, l = midpointX - halfXRange;
         const mProj = (this.holoplayProjectionMatrices[i] = this.holoplayProjectionMatrices[i] || mat4.create());

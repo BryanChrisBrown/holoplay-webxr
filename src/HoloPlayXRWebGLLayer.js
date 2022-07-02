@@ -555,7 +555,7 @@ function makeControls(lkgCanvas) {
     });
 
   const setTargetX = addControl('targetX',
-    { type: 'range', min: -20, max: 20, step: 0.1 },
+    { type: 'range', min: -2000, max: 2000, step: 0.1 },
     {
       label: 'target x',
       title: 'target position x',
@@ -563,7 +563,7 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetY = addControl('targetY',
-    { type: 'range', min: -20, max: 20, step: 0.1 },
+    { type: 'range', min: -2000, max: 2000, step: 0.1 },
     {
       label: 'target y',
       title: 'target position y',
@@ -571,7 +571,7 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetZ = addControl('targetZ',
-    { type: 'range', min: -20, max: 20, step: 0.1 },
+    { type: 'range', min: -2000, max: 2000, step: 0.1 },
     {
       label: 'target z',
       title: 'target position z',
@@ -579,7 +579,7 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetDiam = addControl('targetDiam',
-    { type: 'range', min: 0.2, max: 20, step: 0.1 },
+    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
     {
       label: 'target size',
       title: 'diameter of the target sphere to fit in the screen',
