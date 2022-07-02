@@ -579,11 +579,11 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetDiam = addControl('targetDiam',
-    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
+    { type: 'range', min: 0.000001, max: 2000, step: 0.01 },
     {
       label: 'target size',
       title: 'diameter of the target sphere to fit in the screen',
-      fixRange: v => Math.max(0.2, v),
+      fixRange: v => Math.max(0.000001, v),
       stringify: v => `${(v * 100).toFixed()} cm`,
     });
 
