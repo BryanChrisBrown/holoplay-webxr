@@ -423,7 +423,7 @@ function makeControls(lkgCanvas) {
   help.style.width = '100%';
   help.style.whiteSpace = 'normal';
   help.style.textAlign = 'center';
-  help.innerHTML = 'Bryan is changing this line for his sanity, if this does not update, he will be sad';
+  help.innerHTML = 'Camera: click popup and use WASD, mouse left/right drag, and scroll.';
 
   const lrToggle = document.createElement('input');
   title.appendChild(lrToggle);
@@ -579,11 +579,11 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetDiam = addControl('targetDiam',
-    { type: 'range', min: 0.000001, max: 20, step: 0.001 },
+    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
     {
       label: 'target size',
       title: 'diameter of the target sphere to fit in the screen',
-      fixRange: v => Math.max(0.000001, v),
+      fixRange: v => Math.max(0.2, v),
       stringify: v => `${(v * 100).toFixed()} cm`,
     });
 
@@ -616,15 +616,6 @@ function makeControls(lkgCanvas) {
       title: 'what to show inline on the original canvas (swizzled = no overwrite)',
       fixRange: v => Math.max(0, Math.min(v, 2)),
       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
-    });
-
-  addControl('cameraSpacing',
-    { type: 'range', min: 0, max: 100, step: 0.01 },
-    {
-      label: 'camera spacing',
-      title: 'experimental camera spacing for science',
-      fixRange: v => Math.max(0, v),
-      stringify: v => `${v.toFixed(2)}x`,
     });
 
   lkgCanvas.oncontextmenu = ev => { ev.preventDefault() };

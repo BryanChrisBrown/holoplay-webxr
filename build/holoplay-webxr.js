@@ -7096,7 +7096,6 @@ host this content on a secure origin for the best user experience.
                     this.fovy = 13.0 / 180 * Math.PI;
                     this.depthiness = 1.25;
                     this.inlineView = 1;
-                    this.cameraSpacing = 1;
                   }
                   get calibration() { return this._calibration; }
                   set calibration(v) { this._calibration = deepFreeze(v); this._ensureConfigChangeEvent(); }
@@ -7111,7 +7110,6 @@ host this content on a secure origin for the best user experience.
                   get fovy      () { return this._fovy;       } set fovy      (v) { this._fovy       = v; this._ensureConfigChangeEvent(); }
                   get depthiness() { return this._depthiness; } set depthiness(v) { this._depthiness = v; this._ensureConfigChangeEvent(); }
                   get inlineView() { return this._inlineView; } set inlineView(v) { this._inlineView = v; this._ensureConfigChangeEvent(); }
-                  get cameraSpacing() { return this._cameraSpacing; } set cameraSpacing(v) { this._cameraSpacing = v; this._ensureConfigChangeEvent(); }
                   get aspect() { return this.calibration.screenW.value / this.calibration.screenH.value; }
                   get tileWidth() { return Math.round(this.tileHeight * this.aspect); }
                   get framebufferWidth() {
@@ -7485,7 +7483,7 @@ host this content on a secure origin for the best user experience.
                   help.style.width = '100%';
                   help.style.whiteSpace = 'normal';
                   help.style.textAlign = 'center';
-                  help.innerHTML = 'Bryan is changing this line for his sanity, if this does not update, he will be sad';
+                  help.innerHTML = 'Camera: click popup and use WASD, mouse left/right drag, and scroll.';
                   const lrToggle = document.createElement('input');
                   title.appendChild(lrToggle);
                   lrToggle.type = 'button';
@@ -7622,11 +7620,11 @@ host this content on a secure origin for the best user experience.
                       stringify: v => v.toFixed(2) + ' m',
                     });
                   const setTargetDiam = addControl('targetDiam',
-                    { type: 'range', min: 0.000001, max: 20, step: 0.001 },
+                    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
                     {
                       label: 'target size',
                       title: 'diameter of the target sphere to fit in the screen',
-                      fixRange: v => Math.max(0.000001, v),
+                      fixRange: v => Math.max(0.2, v),
                       stringify: v => `${(v * 100).toFixed()} cm`,
                     });
                   addControl('fovy',
@@ -7656,14 +7654,6 @@ host this content on a secure origin for the best user experience.
                       title: 'what to show inline on the original canvas (swizzled = no overwrite)',
                       fixRange: v => Math.max(0, Math.min(v, 2)),
                       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
-                    });
-                  addControl('cameraSpacing',
-                    { type: 'range', min: 0, max: 100, step: 0.01 },
-                    {
-                      label: 'camera spacing',
-                      title: 'experimental camera spacing for science',
-                      fixRange: v => Math.max(0, v),
-                      stringify: v => `${v.toFixed(2)}x`,
                     });
                   lkgCanvas.oncontextmenu = ev => { ev.preventDefault(); };
                   lkgCanvas.addEventListener('wheel', ev => {
@@ -7794,7 +7784,7 @@ host this content on a secure origin for the best user experience.
                       rotate(mPose, mPose, -cfg.trackballY, [1, 0, 0]);
                       translate(mPose, mPose, [0, 0, focalDistance]);
                       for (let i = 0; i < cfg.numViews; ++i) {
-                        const offsetAlongBaseline = i ;
+                        const offsetAlongBaseline = i;
                         const mView = (this.holoplayInverseViewMatrices[i] = this.holoplayInverseViewMatrices[i] || create$6());
                         translate(mView, mPose, [offsetAlongBaseline, 0, 0]);
                         invert$2(mView, mView);
@@ -7802,7 +7792,7 @@ host this content on a secure origin for the best user experience.
                         const f = clipPlaneBias + renderState.depthFar;
                         const halfYRange = n * tanHalfFovy;
                         const t = halfYRange, b = -halfYRange;
-                        const midpointX = n * -tanAngleToThisCamera;
+                        const midpointX = 0;
                         const halfXRange = cfg.aspect * halfYRange;
                         const r = midpointX + halfXRange, l = midpointX - halfXRange;
                         const mProj = (this.holoplayProjectionMatrices[i] = this.holoplayProjectionMatrices[i] || create$6());

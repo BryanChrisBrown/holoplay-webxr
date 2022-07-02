@@ -106,7 +106,7 @@ export default class HoloPlayXRDevice extends XRDevice {
         // const fractionAlongViewCone = (i + 0.5) / cfg.numViews - 0.5; // -0.5 < this < 0.5
         // const tanAngleToThisCamera = Math.tan(cfg.viewCone * fractionAlongViewCone);
         // const offsetAlongBaseline = focalDistance * tanAngleToThisCamera;
-        const offsetAlongBaseline = i ;
+        const offsetAlongBaseline = i;
 
         const mView = (this.holoplayInverseViewMatrices[i] = this.holoplayInverseViewMatrices[i] || mat4.create());
         mat4.translate(mView, mPose, [offsetAlongBaseline, 0, 0]);
@@ -118,7 +118,7 @@ export default class HoloPlayXRDevice extends XRDevice {
         const f = clipPlaneBias + renderState.depthFar;
         const halfYRange = n * tanHalfFovy;
         const t = halfYRange, b = -halfYRange;
-        const midpointX = n * -tanAngleToThisCamera;
+        const midpointX = 0;
         const halfXRange = cfg.aspect * halfYRange;
         const r = midpointX + halfXRange, l = midpointX - halfXRange;
         const mProj = (this.holoplayProjectionMatrices[i] = this.holoplayProjectionMatrices[i] || mat4.create());
