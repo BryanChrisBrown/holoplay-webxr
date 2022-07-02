@@ -7487,7 +7487,7 @@ host this content on a secure origin for the best user experience.
                   help.style.width = '100%';
                   help.style.whiteSpace = 'normal';
                   help.style.textAlign = 'center';
-                  help.innerHTML = 'Camera: click popup and use WASD, mouse left/right drag, and scroll.';
+                  help.innerHTML = 'Bryan sanity check #2002';
                   const lrToggle = document.createElement('input');
                   title.appendChild(lrToggle);
                   lrToggle.type = 'button';
@@ -7788,7 +7788,7 @@ host this content on a secure origin for the best user experience.
                       rotate(mPose, mPose, -cfg.trackballY, [1, 0, 0]);
                       translate(mPose, mPose, [0, 0, focalDistance]);
                       for (let i = 0; i < cfg.numViews; ++i) {
-                        const offsetAlongBaseline = i;
+                        const offsetAlongBaseline = i * 0.01;
                         const mView = (this.holoplayInverseViewMatrices[i] = this.holoplayInverseViewMatrices[i] || create$6());
                         translate(mView, mPose, [offsetAlongBaseline, 0, 0]);
                         invert$2(mView, mView);

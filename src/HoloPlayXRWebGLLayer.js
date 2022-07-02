@@ -423,7 +423,7 @@ function makeControls(lkgCanvas) {
   help.style.width = '100%';
   help.style.whiteSpace = 'normal';
   help.style.textAlign = 'center';
-  help.innerHTML = 'Camera: click popup and use WASD, mouse left/right drag, and scroll.';
+  help.innerHTML = 'Bryan sanity check #2002';
 
   const lrToggle = document.createElement('input');
   title.appendChild(lrToggle);
