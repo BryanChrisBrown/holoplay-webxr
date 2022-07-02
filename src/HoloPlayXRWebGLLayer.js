@@ -618,6 +618,15 @@ function makeControls(lkgCanvas) {
       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
     });
 
+    addControl('cameraSpacing',
+    { type: 'range', min: 0, max: 100, step: 0.01 },
+    {
+      label: 'camera spacing',
+      title: 'experimental camera spacing for science',
+      fixRange: v => Math.max(0, v),
+      stringify: v => `${v.toFixed(2)}x`,
+    });
+
   lkgCanvas.oncontextmenu = ev => { ev.preventDefault() };
 
   lkgCanvas.addEventListener('wheel', ev => {
