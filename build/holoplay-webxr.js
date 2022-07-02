@@ -7485,7 +7485,7 @@ host this content on a secure origin for the best user experience.
                   help.style.width = '100%';
                   help.style.whiteSpace = 'normal';
                   help.style.textAlign = 'center';
-                  help.innerHTML = 'Camera: click popup and use WASD, mouse left/right drag, and scroll.';
+                  help.innerHTML = 'Bryan is changing this line for his sanity, if this does not update, he will be sad';
                   const lrToggle = document.createElement('input');
                   title.appendChild(lrToggle);
                   lrToggle.type = 'button';
@@ -7657,7 +7657,7 @@ host this content on a secure origin for the best user experience.
                       fixRange: v => Math.max(0, Math.min(v, 2)),
                       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
                     });
-                    addControl('cameraSpacing',
+                  addControl('cameraSpacing',
                     { type: 'range', min: 0, max: 100, step: 0.01 },
                     {
                       label: 'camera spacing',
