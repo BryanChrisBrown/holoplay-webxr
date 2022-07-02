@@ -1577,9 +1577,7 @@ to native implementations of the API.`;
                 };
 
                 const polyfillMakeXRCompatible = Context => {
-                  if (typeof Context.prototype.makeXRCompatible === 'function') {
-                    return false;
-                  }
+                  if (typeof Context.prototype.makeXRCompatible === 'function') ;
                   Context.prototype.makeXRCompatible = function () {
                     this[XR_COMPATIBLE] = true;
                     return Promise.resolve();
@@ -5868,10 +5866,8 @@ to native implementations of the API.`;
                     this.global = this.config.global;
                     this.nativeWebXR = 'xr' in this.global.navigator;
                     this.injected = false;
-                    if (!this.nativeWebXR) {
+                    {
                       this._injectPolyfill(this.global);
-                    } else {
-                      this._injectCompatibilityShims(this.global);
                     }
                   }
                   _injectPolyfill(global) {
@@ -5887,7 +5883,7 @@ to native implementations of the API.`;
                     }
                     {
                       const polyfilledCtx = polyfillMakeXRCompatible(global.WebGLRenderingContext);
-                      if (polyfilledCtx) {
+                      {
                         polyfillGetContext(global.HTMLCanvasElement);
                         if (global.OffscreenCanvas) {
                           polyfillGetContext(global.OffscreenCanvas);
@@ -7104,6 +7100,7 @@ host this content on a secure origin for the best user experience.
                     this.fovy = 13.0 / 180 * Math.PI;
                     this.depthiness = 1.25;
                     this.inlineView = 1;
+                    this.cameraSpacing = 1;
                   }
                   get calibration() { return this._calibration; }
                   set calibration(v) { this._calibration = deepFreeze(v); this._ensureConfigChangeEvent(); }
@@ -7118,6 +7115,7 @@ host this content on a secure origin for the best user experience.
                   get fovy      () { return this._fovy;       } set fovy      (v) { this._fovy       = v; this._ensureConfigChangeEvent(); }
                   get depthiness() { return this._depthiness; } set depthiness(v) { this._depthiness = v; this._ensureConfigChangeEvent(); }
                   get inlineView() { return this._inlineView; } set inlineView(v) { this._inlineView = v; this._ensureConfigChangeEvent(); }
+                  get cameraSpacing() { return this._cameraSpacing; } set cameraSpacing(v) { this._cameraSpacing = v; this._ensureConfigChangeEvent(); }
                   get aspect() { return this.calibration.screenW.value / this.calibration.screenH.value; }
                   get tileWidth() { return Math.round(this.tileHeight * this.aspect); }
                   get framebufferWidth() {
@@ -7604,7 +7602,7 @@ host this content on a secure origin for the best user experience.
                       stringify: v => `${(v / Math.PI * 180).toFixed()}&deg;`,
                     });
                   const setTargetX = addControl('targetX',
-                    { type: 'range', min: -20, max: 20, step: 0.1 },
+                    { type: 'range', min: -2000, max: 2000, step: 0.1 },
                     {
                       label: 'target x',
                       title: 'target position x',
@@ -7612,7 +7610,7 @@ host this content on a secure origin for the best user experience.
                       stringify: v => v.toFixed(2) + ' m',
                     });
                   const setTargetY = addControl('targetY',
-                    { type: 'range', min: -20, max: 20, step: 0.1 },
+                    { type: 'range', min: -2000, max: 2000, step: 0.1 },
                     {
                       label: 'target y',
                       title: 'target position y',
@@ -7620,7 +7618,7 @@ host this content on a secure origin for the best user experience.
                       stringify: v => v.toFixed(2) + ' m',
                     });
                   const setTargetZ = addControl('targetZ',
-                    { type: 'range', min: -20, max: 20, step: 0.1 },
+                    { type: 'range', min: -2000, max: 2000, step: 0.1 },
                     {
                       label: 'target z',
                       title: 'target position z',
@@ -7628,11 +7626,11 @@ host this content on a secure origin for the best user experience.
                       stringify: v => v.toFixed(2) + ' m',
                     });
                   const setTargetDiam = addControl('targetDiam',
-                    { type: 'range', min: 0.2, max: 20, step: 0.1 },
+                    { type: 'range', min: 0.000001, max: 20, step: 0.001 },
                     {
                       label: 'target size',
                       title: 'diameter of the target sphere to fit in the screen',
-                      fixRange: v => Math.max(0.2, v),
+                      fixRange: v => Math.max(0.000001, v),
                       stringify: v => `${(v * 100).toFixed()} cm`,
                     });
                   addControl('fovy',
@@ -7662,6 +7660,14 @@ host this content on a secure origin for the best user experience.
                       title: 'what to show inline on the original canvas (swizzled = no overwrite)',
                       fixRange: v => Math.max(0, Math.min(v, 2)),
                       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
+                    });
+                    addControl('cameraSpacing',
+                    { type: 'range', min: 0, max: 100, step: 0.01 },
+                    {
+                      label: 'camera spacing',
+                      title: 'experimental camera spacing for science',
+                      fixRange: v => Math.max(0, v),
+                      stringify: v => `${v.toFixed(2)}x`,
                     });
                   lkgCanvas.oncontextmenu = ev => { ev.preventDefault(); };
                   lkgCanvas.addEventListener('wheel', ev => {
@@ -7785,15 +7791,14 @@ host this content on a secure origin for the best user experience.
                       const tanHalfFovy = Math.tan(0.5 * cfg.fovy);
                       const focalDistance = 0.5 * cfg.targetDiam / tanHalfFovy;
                       const clipPlaneBias = focalDistance - cfg.targetDiam;
+                      console.log(clipPlaneBias, 'HoloPlay WebXR - Clip Plane Bias');
                       const mPose = this.basePoseMatrix;
                       fromTranslation(mPose, [cfg.targetX, cfg.targetY, cfg.targetZ]);
                       rotate(mPose, mPose, cfg.trackballX, [0, 1, 0]);
                       rotate(mPose, mPose, -cfg.trackballY, [1, 0, 0]);
                       translate(mPose, mPose, [0, 0, focalDistance]);
                       for (let i = 0; i < cfg.numViews; ++i) {
-                        const fractionAlongViewCone = (i + 0.5) / cfg.numViews - 0.5;
-                        const tanAngleToThisCamera = Math.tan(cfg.viewCone * fractionAlongViewCone);
-                        const offsetAlongBaseline = focalDistance * tanAngleToThisCamera;
+                        const offsetAlongBaseline = i ;
                         const mView = (this.holoplayInverseViewMatrices[i] = this.holoplayInverseViewMatrices[i] || create$6());
                         translate(mView, mPose, [offsetAlongBaseline, 0, 0]);
                         invert$2(mView, mView);
