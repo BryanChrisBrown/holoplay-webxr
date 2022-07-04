@@ -81,6 +81,7 @@ const makeConfig = () => new class extends EventTarget {
     this.fovy = 13.0 / 180 * Math.PI;
     this.depthiness = 1.25;
     this.inlineView = 1;
+    this.viewNumber = 1;
   }
 
   get calibration() { return this._calibration; }
@@ -99,6 +100,7 @@ const makeConfig = () => new class extends EventTarget {
   get fovy      () { return this._fovy;       } set fovy      (v) { this._fovy       = v; this._ensureConfigChangeEvent(); }
   get depthiness() { return this._depthiness; } set depthiness(v) { this._depthiness = v; this._ensureConfigChangeEvent(); }
   get inlineView() { return this._inlineView; } set inlineView(v) { this._inlineView = v; this._ensureConfigChangeEvent(); }
+  get viewNumber() { return this._viewNumber; } set viewNumber(v) { this._viewNumber = v; this._ensureConfigChangeEvent(); }
 
   // computed
 

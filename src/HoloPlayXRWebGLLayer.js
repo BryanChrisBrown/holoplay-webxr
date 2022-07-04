@@ -32,6 +32,7 @@ export default class HoloPlayXRWebGLLayer extends XRWebGLLayer {
     super(session, gl, layerInit);
 
     const cfg = getHoloPlayConfig();
+    console.log(cfg)
 
     // Set up framebuffer/texture.
 
@@ -300,7 +301,7 @@ export default class HoloPlayXRWebGLLayer extends XRWebGLLayer {
 
           // And optionally render over with a "nicer" inline view
           if (cfg.inlineView !== 0) {
-            gl.uniform1i(u_viewType, cfg.inlineView);
+            gl.uniform1i(u_viewType, cfg._viewNumber);
             gl.drawArrays(gl.TRIANGLES, 0, 6);
           }
         }
@@ -423,7 +424,7 @@ function makeControls(lkgCanvas) {
   help.style.width = '100%';
   help.style.whiteSpace = 'normal';
   help.style.textAlign = 'center';
-  help.innerHTML = 'Bryan sanity check #2002';
+  help.innerHTML = 'Bryan sanity check #2008';
 
   const lrToggle = document.createElement('input');
   title.appendChild(lrToggle);
@@ -436,6 +437,7 @@ function makeControls(lkgCanvas) {
   };
 
   const controlListDiv = document.createElement('div');
+
   c.appendChild(controlListDiv);
 
   const addControl = (name, attrs, opts) => {
@@ -579,12 +581,12 @@ function makeControls(lkgCanvas) {
       stringify: v => v.toFixed(2) + ' m',
     });
   const setTargetDiam = addControl('targetDiam',
-    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
+    { type: 'range', min: 0.002, max: 2000, step: 0.001 },
     {
       label: 'target size',
       title: 'diameter of the target sphere to fit in the screen',
-      fixRange: v => Math.max(0.2, v),
-      stringify: v => `${(v * 100).toFixed()} cm`,
+      fixRange: v => Math.max(0.002, v),
+      stringify: v => `${(v * 10).toFixed()} mm`,
     });
 
   addControl('fovy',
@@ -616,6 +618,15 @@ function makeControls(lkgCanvas) {
       title: 'what to show inline on the original canvas (swizzled = no overwrite)',
       fixRange: v => Math.max(0, Math.min(v, 2)),
       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
+    });
+
+  addControl('viewNumber',
+    { type: 'range', min: 0, max: cfg.numViews, step: 1 },
+    {
+      label: 'view Number',
+      title: 'controls the view displayed by the "inline view" option above, (no effect in quilt or swizzle view mode)',
+      fixRange: v => Math.max(0,cfg.numViews),
+      stringify: v => v
     });
 
   lkgCanvas.oncontextmenu = ev => { ev.preventDefault() };

@@ -7096,6 +7096,7 @@ host this content on a secure origin for the best user experience.
                     this.fovy = 13.0 / 180 * Math.PI;
                     this.depthiness = 1.25;
                     this.inlineView = 1;
+                    this.viewNumber = 1;
                   }
                   get calibration() { return this._calibration; }
                   set calibration(v) { this._calibration = deepFreeze(v); this._ensureConfigChangeEvent(); }
@@ -7110,6 +7111,7 @@ host this content on a secure origin for the best user experience.
                   get fovy      () { return this._fovy;       } set fovy      (v) { this._fovy       = v; this._ensureConfigChangeEvent(); }
                   get depthiness() { return this._depthiness; } set depthiness(v) { this._depthiness = v; this._ensureConfigChangeEvent(); }
                   get inlineView() { return this._inlineView; } set inlineView(v) { this._inlineView = v; this._ensureConfigChangeEvent(); }
+                  get viewNumber() { return this._viewNumber; } set viewNumber(v) { this._viewNumber = v; this._ensureConfigChangeEvent(); }
                   get aspect() { return this.calibration.screenW.value / this.calibration.screenH.value; }
                   get tileWidth() { return Math.round(this.tileHeight * this.aspect); }
                   get framebufferWidth() {
@@ -7159,6 +7161,7 @@ host this content on a secure origin for the best user experience.
                   constructor(session, gl, layerInit) {
                     super(session, gl, layerInit);
                     const cfg = getHoloPlayConfig();
+                    console.log(cfg);
                     const config = this[PRIVATE$g].config;
                     const texture = gl.createTexture();
                     let depthStencil, dsConfig;
@@ -7376,7 +7379,7 @@ host this content on a secure origin for the best user experience.
                           lkgCtx.clearRect(0, 0, lkgCanvas.width, lkgCanvas.height);
                           lkgCtx.drawImage(appCanvas, 0, 0);
                           if (cfg.inlineView !== 0) {
-                            gl.uniform1i(u_viewType, cfg.inlineView);
+                            gl.uniform1i(u_viewType, cfg._viewNumber);
                             gl.drawArrays(gl.TRIANGLES, 0, 6);
                           }
                         }
@@ -7483,7 +7486,7 @@ host this content on a secure origin for the best user experience.
                   help.style.width = '100%';
                   help.style.whiteSpace = 'normal';
                   help.style.textAlign = 'center';
-                  help.innerHTML = 'Bryan sanity check #2002';
+                  help.innerHTML = 'Bryan sanity check #2008';
                   const lrToggle = document.createElement('input');
                   title.appendChild(lrToggle);
                   lrToggle.type = 'button';
@@ -7620,12 +7623,12 @@ host this content on a secure origin for the best user experience.
                       stringify: v => v.toFixed(2) + ' m',
                     });
                   const setTargetDiam = addControl('targetDiam',
-                    { type: 'range', min: 0.02, max: 2000, step: 0.1 },
+                    { type: 'range', min: 0.002, max: 2000, step: 0.001 },
                     {
                       label: 'target size',
                       title: 'diameter of the target sphere to fit in the screen',
-                      fixRange: v => Math.max(0.2, v),
-                      stringify: v => `${(v * 100).toFixed()} cm`,
+                      fixRange: v => Math.max(0.002, v),
+                      stringify: v => `${(v * 10).toFixed()} mm`,
                     });
                   addControl('fovy',
                     { type: 'range', min: 1.0 / 180 * Math.PI, max: 120.1 / 180 * Math.PI, step: 1.0 / 180 * Math.PI },
@@ -7654,6 +7657,14 @@ host this content on a secure origin for the best user experience.
                       title: 'what to show inline on the original canvas (swizzled = no overwrite)',
                       fixRange: v => Math.max(0, Math.min(v, 2)),
                       stringify: v => v === 0 ? 'swizzled' : v === 1 ? 'center' : v === 2 ? 'quilt' : '?',
+                    });
+                  addControl('viewNumber',
+                    { type: 'range', min: 0, max: cfg.numViews, step: 1 },
+                    {
+                      label: 'view Number',
+                      title: 'controls the view displayed by the "inline view" option above, (no effect in quilt or swizzle view mode)',
+                      fixRange: v => Math.max(0,cfg.numViews),
+                      stringify: v => v
                     });
                   lkgCanvas.oncontextmenu = ev => { ev.preventDefault(); };
                   lkgCanvas.addEventListener('wheel', ev => {
@@ -7776,22 +7787,24 @@ host this content on a secure origin for the best user experience.
                     if (session.immersive) {
                       const tanHalfFovy = Math.tan(0.5 * cfg.fovy);
                       const focalDistance = 0.5 * cfg.targetDiam / tanHalfFovy;
-                      const clipPlaneBias = focalDistance - cfg.targetDiam;
-                      console.log(clipPlaneBias, 'HoloPlay WebXR - Clip Plane Bias');
+                      const clipPlaneBias = focalDistance;
                       const mPose = this.basePoseMatrix;
                       fromTranslation(mPose, [cfg.targetX, cfg.targetY, cfg.targetZ]);
                       rotate(mPose, mPose, cfg.trackballX, [0, 1, 0]);
                       rotate(mPose, mPose, -cfg.trackballY, [1, 0, 0]);
                       translate(mPose, mPose, [0, 0, focalDistance]);
                       for (let i = 0; i < cfg.numViews; ++i) {
-                        const offsetAlongBaseline = i * 0.01;
+                        const fractionAlongViewCone = (i + 0.5) / cfg.numViews - 0.5;
+                        const tanAngleToThisCamera = Math.tan(cfg.viewCone * fractionAlongViewCone);
+                        const offsetAlongBaseline = i;
                         const mView = (this.holoplayInverseViewMatrices[i] = this.holoplayInverseViewMatrices[i] || create$6());
                         translate(mView, mPose, [offsetAlongBaseline, 0, 0]);
                         invert$2(mView, mView);
                         const n = Math.max(clipPlaneBias + renderState.depthNear, 0.01);
                         const f = clipPlaneBias + renderState.depthFar;
                         const halfYRange = n * tanHalfFovy;
-                        const t = halfYRange, b = -halfYRange;
+                        const t = halfYRange;
+                        const b = -halfYRange;
                         const midpointX = 0;
                         const halfXRange = cfg.aspect * halfYRange;
                         const r = midpointX + halfXRange, l = midpointX - halfXRange;
